@@ -9,6 +9,9 @@ use App\Models\LeasingPeriod;
 
 class LeasingController extends Controller
 {
+    /**
+     * Method to update leasing details
+     */
     public function updateLeasing(UpdateLeasingRequest $request, $id)
     {
         try {

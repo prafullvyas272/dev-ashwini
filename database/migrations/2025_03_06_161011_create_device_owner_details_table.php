@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('deviceId');
             $table->foreign('deviceId')->references('id')->on('devices')->onDelete('cascade');
-            $table->string('billineName')->nullable();
+            $table->string('billingName')->nullable();
             $table->string('addressCountry')->nullable();
             $table->string('addressZip')->nullable();
             $table->string('addressCity')->nullable();

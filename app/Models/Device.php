@@ -40,7 +40,7 @@ class Device extends Model
 
     public function getDeviceOwnerAttribute()
     {
-        return $this->deviceOwnerDetails['billineName'];
+        return $this->deviceOwnerDetails['billingName'];
     }
 
 

@@ -17,6 +17,9 @@ class DeviceController extends Controller
 {
     use DeviceTrait;
 
+    /**
+     * Method to get the device info
+     */
     public function getDeviceInfo($id)
     {
         $device = Device::find($id);
@@ -25,28 +28,23 @@ class DeviceController extends Controller
             return response()->json(['error' => 'Device not found'], 404);
         }
 
-        if ($device->deviceTypeId === AppDeviceType::LEASING) { //check for leasing
+        if ($device->deviceTypeId === AppDeviceType::LEASING) {
             $response = $device->withoutRelations();
 
             $response['deviceOwnerDetails'] = $device->deviceOwnerDetails->only([
-                'billineName',
+                'billingName',
                 'addressCountry',
                 'addressZip',
                 'addressCity',
                 'addressStreet',
                 'vatNumber'
             ]);
-            $response['leasingPeriodsComputed'] = $device->leasingPeriods;
             $currentLeasingPeriod = $device->leasingPeriods
-    ->where('leasingActualPeriodStartDate', '<=', now()) // Find periods that have started
-    ->sortByDesc('leasingActualPeriodStartDate') // Get the most recent one
-    ->first(); // Get only the latest valid period
-
-dd($currentLeasingPeriod);
-
-
+                ->where('leasingActualPeriodStartDate', '<=', now())
+                ->sortByDesc('leasingActualPeriodStartDate')
+                ->first();
+            $response['leasingPeriodsComputed'] = $currentLeasingPeriod;
             $response['leasingPeriods'] = $device->leasingPeriods;
-
             $response = $this->getListDeviceInfoResponse($response);
         } else {
             $response['leasingPeriods'] = [];
@@ -56,11 +54,13 @@ dd($currentLeasingPeriod);
     }
 
 
+    /**
+     * Method to register the device
+     */
     public function registerDevice(DeviceRegisterRequest $request)
     {
         try {
             $deviceAPIKey = Str::random(32);
-            $activationCode = Str::random(32);
 
             $device = Device::whereDeviceid($request->deviceData()['deviceId'])->first();
 
@@ -74,22 +74,29 @@ dd($currentLeasingPeriod);
             }
 
 
-            $device = Device::create([
-                'deviceId' => $request->deviceData()['deviceId'],
-                'deviceTypeId' => 1,
-                'deviceAPIKey' => $deviceAPIKey,
-                'activationCode' => $activationCode,
-            ]);
+            // $device = Device::create([
+            //     'deviceId' => $request->deviceData()['deviceId'],
+            //     'deviceTypeId' => AppDeviceType::UNSET,
+            //     'deviceAPIKey' => $deviceAPIKey,
+            // ]);
 
+            /**
+             * If the registration is successfully performed without the activation_code and the tablet does not have
+             * activation_code associated to it - its device_type changes to free (tablet is being used without
+             * leasing plan and has limited use).
+             */
             if ($request->input('activationCode') == null && $device) {
-                $device->update([
-                    'deviceTypeId' => 2 //update to free
-                ]);
+                $this->updateDeviceType($device, AppDeviceType::FREE);
             }
+
+            /**
+             * If the registration is successfully performed with the activation_code - its device_type changes to
+             * leasing (tablet can be used according to a leasing plan).
+             * leasing: registered and activation_code assigned
+             */
             if ($request->input('activationCode') && $device) {
-                $device->update([
-                    'deviceTypeId' => 3 //update to leasing
-                ]);
+                $this->updateDeviceType($device, AppDeviceType::LEASING);
+                $this->assignActivationCode($device);
             }
 
             // Return response with device info
@@ -109,8 +116,31 @@ dd($currentLeasingPeriod);
         }
     }
 
+    /**
+     * Method to get device type by id
+     */
     public function getDeviceTypebyId($deviceTypeId)
     {
         return DeviceType::whereId($deviceTypeId)->first()['name'];
+    }
+
+    /**
+     * Method to update the device type
+     */
+    public function updateDeviceType($device , $deviceType)
+    {
+        return $device->update([
+            'deviceTypeId' => $deviceType
+        ]);
+    }
+
+    /**
+     * Method to assign the activation code
+     */
+    public function assignActivationCode($device)
+    {
+        return $device->update([
+            'activationCode' => Str::random(64)
+        ]);
     }
 }

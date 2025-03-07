@@ -22,4 +22,13 @@ trait DeviceTrait
 
         return $response;
     }
+
+    public function sendRegistrationFailedResponse()
+    {
+        $data = [
+            "title" =>  "Device Registration failed",
+            "description" =>  "Device Id not found"
+        ];
+        return response()->json($data, 422);
+    }
 }

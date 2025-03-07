@@ -11,7 +11,7 @@ class DeviceOwnerDetailSeeder extends Seeder
     {
         DeviceOwnerDetail::create([
             'deviceId' => 1,  // Use actual device ID
-            'billineName' => 'WebOrigo Magyarország Zrt.',
+            'billingName' => 'WebOrigo Magyarország Zrt.',
             'addressCountry' => '348',
             'addressZip' => '1027',
             'addressCity' => 'Budapest',
