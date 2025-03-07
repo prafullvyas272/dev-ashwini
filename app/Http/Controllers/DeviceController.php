@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DeviceType as AppDeviceType;
 use App\Http\Requests\DeviceRegisterRequest;
 use Illuminate\Http\Request;
 use App\Models\Device;
@@ -21,31 +22,14 @@ class DeviceController extends Controller
             return response()->json(['error' => 'Device not found'], 404);
         }
 
-        $response = [
-            'deviceId' => $device->deviceId,
-            'deviceType' => $device->deviceType,
-            'timestamp' => now()->toDateTimeString()
-        ];
-
-        if ($device->deviceType === 'leasing') {
-            $ownerDetails = DeviceOwnerDetail::where('device_id', $device->id)->first();
-            $leasingPeriods = LeasingPeriod::where('device_id', $device->id)->get();
-            $leasingPeriodsComputed = [
-                'leasingConstructionId' => 51342268,
-                'leasingConstructionMaximumTraining' => 1000,
-                'leasingConstructionMaximumDate' => '2021-06-01',
-                'leasingActualPeriodStartDate' => '2021-12-01',
-                'leasingNextCheck' => '2021-12-01 17:30:00',
-            ];
-            $response['deviceOwner'] = $ownerDetails ? $ownerDetails->billing_name : null;
-            $response['deviceOwnerDetails'] = $ownerDetails;
-            $response['leasingPeriodsComputed'] = $leasingPeriodsComputed;
-            $response['leasingPeriods'] = $leasingPeriods;
+        if ($device->deviceTypeId === AppDeviceType::LEASING) { //check for leasing
+            $response = $device->withoutRelations();
+            $response['deviceOwnerDetails'] = $device->deviceOwnerDetails;
+            $response['leasingPeriods'] = $device->leasingPeriods;
         } else {
             $response['leasingPeriods'] = [];
         }
 
-       
         return response()->json($response);
     }
 
