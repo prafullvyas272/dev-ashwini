@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('leasing_periods', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('device_id');
-            $table->foreign('device_id')->references('id')->on('devices')->onDelete('cascade');
-            $table->unsignedBigInteger('leasing_construction_id');
-            $table->integer('leasing_construction_maximum_training')->nullable();
-            $table->date('leasing_construction_maximum_date')->nullable();
+            $table->unsignedBigInteger('deviceId');
+            $table->foreign('deviceId')->references('id')->on('devices')->onDelete('cascade');
+            $table->unsignedBigInteger('leasingConstructionId');
+            $table->integer('leasingConstructionMaximumTraining')->nullable();
+            $table->date('leasingConstructionMaximumDate')->nullable();
             $table->timestamps();
         });
     }

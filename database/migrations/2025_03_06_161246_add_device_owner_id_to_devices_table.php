@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->unsignedBigInteger('device_owner_id')->nullable();
-            $table->foreign('device_owner_id')->references('id')->on('device_owner_details')->onDelete('set null');
+            $table->unsignedBigInteger('deviceOwnerId')->nullable();
+            $table->foreign('deviceOwnerId')->references('id')->on('device_owner_details')->onDelete('set null');
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->dropForeign(['device_owner_id']);
-            $table->dropColumn('device_owner_id');
+            $table->dropForeign(['deviceOwnerId']);
+            $table->dropColumn('deviceOwnerId');
         });
     }
 };

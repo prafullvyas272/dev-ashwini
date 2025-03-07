@@ -10,13 +10,13 @@ class DeviceOwnerDetailSeeder extends Seeder
     public function run()
     {
         DeviceOwnerDetail::create([
-            'device_id' => 1,  // Use actual device ID
-            'billing_name' => 'WebOrigo Magyarország Zrt.',
-            'address_country' => '348',
-            'address_zip' => '1027',
-            'address_city' => 'Budapest',
-            'address_street' => 'Bem József utca 9. fszt.',
-            'vat_number' => '28767116-2-41',
+            'deviceId' => 1,  // Use actual device ID
+            'billineName' => 'WebOrigo Magyarország Zrt.',
+            'addressCountry' => '348',
+            'addressZip' => '1027',
+            'addressCity' => 'Budapest',
+            'addressStreet' => 'Bem József utca 9. fszt.',
+            'vatNumber' => '28767116-2-41',
         ]);
     }
 }

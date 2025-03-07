@@ -13,7 +13,7 @@ class Device extends Model
      */
     public function leasingPeriods()
     {
-        return $this->hasMany(LeasingPeriod::class, 'device_id');
+        return $this->hasMany(LeasingPeriod::class, 'deviceId');
     }
 
     /**
@@ -30,6 +30,6 @@ class Device extends Model
      */
     public function deviceOwnerDetails()
     {
-        return $this->hasOne(DeviceOwnerDetail::class, 'device_id');
+        return $this->hasOne(DeviceOwnerDetail::class, 'deviceId');
     }
 }

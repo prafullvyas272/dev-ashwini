@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('device_owner_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('device_id');
-            $table->foreign('device_id')->references('id')->on('devices')->onDelete('cascade');
-            $table->string('billing_name')->nullable();
-            $table->string('address_country')->nullable();
-            $table->string('address_zip')->nullable();
-            $table->string('address_city')->nullable();
-            $table->string('address_street')->nullable();
-            $table->string('vat_number')->nullable();
+            $table->unsignedBigInteger('deviceId');
+            $table->foreign('deviceId')->references('id')->on('devices')->onDelete('cascade');
+            $table->string('billineName')->nullable();
+            $table->string('addressCountry')->nullable();
+            $table->string('addressZip')->nullable();
+            $table->string('addressCity')->nullable();
+            $table->string('addressStreet')->nullable();
+            $table->string('vatNumber')->nullable();
             $table->timestamps();
         });
     }

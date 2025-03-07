@@ -10,24 +10,24 @@ class LeasingPeriodSeeder extends Seeder
     public function run()
     {
         LeasingPeriod::create([
-            'device_id' => 1,  // Use actual device ID
-            'leasing_construction_id' => 51342268,
-            'leasing_construction_maximum_training' => 1000,
-            'leasing_construction_maximum_date' => '2021-06-01',
+            'deviceId' => 1,  // Use actual device ID
+            'leasingConstructionId' => 51342268,
+            'leasingConstructionMaximumTraining' => 1000,
+            'leasingConstructionMaximumDate' => '2021-06-01',
         ]);
 
         LeasingPeriod::create([
-            'device_id' => 1,  // Use actual device ID
-            'leasing_construction_id' => 42115269,
-            'leasing_construction_maximum_training' => null,
-            'leasing_construction_maximum_date' => '2021-10-01',
+            'deviceId' => 1,  // Use actual device ID
+            'leasingConstructionId' => 42115269,
+            'leasingConstructionMaximumTraining' => null,
+            'leasingConstructionMaximumDate' => '2021-10-01',
         ]);
 
         LeasingPeriod::create([
-            'device_id' => 1,  // Use actual device ID
-            'leasing_construction_id' => 28524612,
-            'leasing_construction_maximum_training' => 50,
-            'leasing_construction_maximum_date' => null,
+            'deviceId' => 1,  // Use actual device ID
+            'leasingConstructionId' => 28524612,
+            'leasingConstructionMaximumTraining' => 50,
+            'leasingConstructionMaximumDate' => null,
         ]);
     }
 }
