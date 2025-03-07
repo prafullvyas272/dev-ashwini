@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DeviceRegisterRequest extends FormRequest
 {
@@ -23,7 +24,7 @@ class DeviceRegisterRequest extends FormRequest
     {
         return [
             'deviceId' => ['required', 'max:255'],
-            'activationCode' => ['nullable', 'max:255', 'unique:devices']
+            'activationCode' => ['nullable', 'max:255', Rule::unique('devices')->ignore($this->input('deviceId'), 'deviceId')]
         ];
     }
 

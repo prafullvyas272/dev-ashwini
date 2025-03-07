@@ -64,3 +64,12 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Steps to Run the application
+
+1. git clone repository-link
+2. composer i
+3. npm i
+4. php artisan migrate:fresh --seed
+5. Dummy data will be inserted for Devices, DeviceType, LeasingPlans and OwnerDetails
+6. API Endpoints will be provided in collection. 

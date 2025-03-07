@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\DeviceOwnerDetail;
 use App\Models\LeasingPeriod;
 use App\DeviceTrait;
+use App\Models\ActivationCode;
 
 class DeviceController extends Controller
 {
@@ -28,7 +29,7 @@ class DeviceController extends Controller
             return response()->json(['error' => 'Device not found'], 404);
         }
 
-        if ($device->deviceTypeId === AppDeviceType::LEASING) {
+        if ($device->deviceTypeId === AppDeviceType::FREE || $device->deviceTypeId === AppDeviceType::LEASING) {
             $response = $device->withoutRelations();
 
             $response['deviceOwnerDetails'] = $device->deviceOwnerDetails->only([
@@ -61,10 +62,38 @@ class DeviceController extends Controller
     {
         try {
             $deviceAPIKey = Str::random(32);
-
             $device = Device::whereDeviceid($request->deviceData()['deviceId'])->first();
 
-            if ($device) {
+            if (!$device) {
+                return response()->json([
+                    'error' => 'Device not found',
+                    'description' => 'Device not exist in DB.'
+                ], 404);
+            }
+
+            /**
+             * Handle Case D, E
+             * device does not have “activationCode“ assigned and it is already registered as “free” and it tries to register
+             * with valid (existing and not already associated to another device) “activationCode”
+             */
+            $activationCode = $request->input('activationCode');
+            $isActivationCodeValid = $this->checkIfActivationCodeValid($activationCode);
+
+            if ($request->has('activationCode') && !$isActivationCodeValid) {
+                return response()->json([
+                    'error' => 'The activation code is invalid',
+                    'description' => 'The activation code does not exist in DB.'
+                ], 404);
+            }
+            if ($device && $isActivationCodeValid) {
+                $this->assignActivationCode($device, $activationCode);
+                ActivationCode::where('activationCode', $activationCode)->update([
+                    'deviceId' => $device->id,
+                ]);
+                $device->update([
+                    "deviceAPIKey" => $deviceAPIKey,
+                    "deviceTypeId" => AppDeviceType::LEASING,
+                ]);
                 return response()->json([
                     "deviceId" => $device->deviceId,
                     "deviceAPIKey" => $deviceAPIKey,
@@ -73,12 +102,28 @@ class DeviceController extends Controller
                 ]);
             }
 
+            $deviceType = $activationCode == null ?  AppDeviceType::FREE : AppDeviceType::LEASING;
 
-            // $device = Device::create([
-            //     'deviceId' => $request->deviceData()['deviceId'],
-            //     'deviceTypeId' => AppDeviceType::UNSET,
-            //     'deviceAPIKey' => $deviceAPIKey,
-            // ]);
+            if ($device) {
+                $device->update([
+                    "deviceAPIKey" => $deviceAPIKey,
+                    "deviceTypeId" => $deviceType,
+                ]);
+                if (!$device->activationCode) {
+                    $activationCode = ActivationCode::where('deviceId', null)->first()['activationCode'];
+                    $this->assignActivationCode($device, $activationCode);
+                    ActivationCode::where('activationCode', $activationCode)->update([
+                        'deviceId' => $device->id,
+                    ]);
+                }
+
+                return response()->json([
+                    "deviceId" => $device->deviceId,
+                    "deviceAPIKey" => $deviceAPIKey,
+                    "deviceType" => $this->getDeviceTypebyId($device->deviceTypeId),
+                    "timestamp" => now()->toDateTimeString()
+                ]);
+            }
 
             /**
              * If the registration is successfully performed without the activation_code and the tablet does not have
@@ -137,10 +182,18 @@ class DeviceController extends Controller
     /**
      * Method to assign the activation code
      */
-    public function assignActivationCode($device)
+    public function assignActivationCode($device, $activationCode = null)
     {
         return $device->update([
-            'activationCode' => Str::random(64)
+            'activationCode' => $activationCode ?? Str::random(30)
         ]);
+    }
+
+    /**
+     * Method to assign the activation code
+     */
+    public function checkIfActivationCodeValid($activationCode)
+    {
+        return ActivationCode::where('activationCode', $activationCode)->where('deviceId', null)->exists();
     }
 }

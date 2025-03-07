@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(DeviceSeeder::class);
         $this->call(DeviceOwnerDetailSeeder::class);
         $this->call(LeasingPeriodSeeder::class);
+        $this->call(ActivationCodeSeeder::class);
     }
 }
