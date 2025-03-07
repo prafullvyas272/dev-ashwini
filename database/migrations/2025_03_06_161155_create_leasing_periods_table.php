@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('leasingConstructionId');
             $table->integer('leasingConstructionMaximumTraining')->nullable();
             $table->date('leasingConstructionMaximumDate')->nullable();
+            $table->date('leasingActualPeriodStartDate')->nullable();
+            $table->date('leasingNextCheck')->nullable();
             $table->timestamps();
         });
     }

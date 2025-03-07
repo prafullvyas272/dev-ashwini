@@ -11,9 +11,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\DeviceOwnerDetail;
 use App\Models\LeasingPeriod;
+use App\DeviceTrait;
 
 class DeviceController extends Controller
 {
+    use DeviceTrait;
+
     public function getDeviceInfo($id)
     {
         $device = Device::find($id);
@@ -24,8 +27,27 @@ class DeviceController extends Controller
 
         if ($device->deviceTypeId === AppDeviceType::LEASING) { //check for leasing
             $response = $device->withoutRelations();
-            $response['deviceOwnerDetails'] = $device->deviceOwnerDetails;
+
+            $response['deviceOwnerDetails'] = $device->deviceOwnerDetails->only([
+                'billineName',
+                'addressCountry',
+                'addressZip',
+                'addressCity',
+                'addressStreet',
+                'vatNumber'
+            ]);
+            $response['leasingPeriodsComputed'] = $device->leasingPeriods;
+            $currentLeasingPeriod = $device->leasingPeriods
+    ->where('leasingActualPeriodStartDate', '<=', now()) // Find periods that have started
+    ->sortByDesc('leasingActualPeriodStartDate') // Get the most recent one
+    ->first(); // Get only the latest valid period
+
+dd($currentLeasingPeriod);
+
+
             $response['leasingPeriods'] = $device->leasingPeriods;
+
+            $response = $this->getListDeviceInfoResponse($response);
         } else {
             $response['leasingPeriods'] = [];
         }

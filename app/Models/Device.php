@@ -8,6 +8,10 @@ class Device extends Model
 {
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    protected $appends = [
+        'deviceOwner',
+    ];
+
     /**
      * Relation to load leasing periods
      */
@@ -32,4 +36,12 @@ class Device extends Model
     {
         return $this->hasOne(DeviceOwnerDetail::class, 'deviceId');
     }
+
+
+    public function getDeviceOwnerAttribute()
+    {
+        return $this->deviceOwnerDetails['billineName'];
+    }
+
+
 }
